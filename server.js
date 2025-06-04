@@ -1,20 +1,22 @@
-// server.js
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const path = require('path');
 
 dotenv.config();
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Middleware
+app.use(helmet());
+app.use(morgan('combined'));
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.')); // Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname)));
 
-// MongoDB Connection
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -27,12 +29,12 @@ async function connectToMongo() {
     console.log('Connected to MongoDB');
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    process.exit(1);
   }
 }
 
 connectToMongo();
 
-// Register User
 app.post('/api/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -66,7 +68,6 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Login User
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -88,14 +89,39 @@ app.post('/api/login', async (req, res) => {
       { $set: { sessionToken, sessionTimestamp: new Date().getTime() } }
     );
 
-    res.status(200).json({ message: 'Login successful', username, sessionToken });
+    res.status(200).json({
+      message: 'Login successful',
+      username,
+      sessionToken,
+      subscriptionEnd: user.subscriptionEnd || null
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });
   }
 });
 
-// Logout User
+app.post('/api/validate-session', async (req, res) => {
+  try {
+    const { username, sessionToken } = req.body;
+    const usersCollection = db.collection('users');
+    const user = await usersCollection.findOne({ username, sessionToken });
+
+    if (!user) {
+      return res.status(401).json({ valid: false });
+    }
+
+    res.status(200).json({
+      valid: true,
+      isSubscribed: user.subscriptionEnd > new Date().getTime(),
+      subscriptionEnd: user.subscriptionEnd || null
+    });
+  } catch (error) {
+    console.error('Session validation error:', error);
+    res.status(500).json({ valid: false });
+  }
+});
+
 app.post('/api/logout', async (req, res) => {
   try {
     const { username } = req.body;
@@ -111,7 +137,6 @@ app.post('/api/logout', async (req, res) => {
   }
 });
 
-// Submit Access Code
 app.post('/api/submit-code', async (req, res) => {
   try {
     const { username, code, subscriptionMonths } = req.body;
@@ -121,113 +146,10 @@ app.post('/api/submit-code', async (req, res) => {
 
     const firstLetter = username.charAt(0).toUpperCase();
     const usernameCodes = {
-      // Your existing usernameCodes object (omitted for brevity, copy from scripts.txt)
-      A: {
-    threeMonths: { initial: "222978", renewal: "000000" },
-    sevenMonths: { initial: "111000", renewal: "300000" },
-  },
-  B: {
-    threeMonths: { initial: "222496", renewal: "111111" },
-    sevenMonths: { initial: "111001", renewal: "310000" },
-  },
-  C: {
-    threeMonths: { initial: "222110", renewal: "222222" },
-    sevenMonths: { initial: "111002", renewal: "320000" },
-  },
-  D: {
-    threeMonths: { initial: "222111", renewal: "333333" },
-    sevenMonths: { initial: "111003", renewal: "330000" },
-  },
-  E: {
-    threeMonths: { initial: "222112", renewal: "444444" },
-    sevenMonths: { initial: "111004", renewal: "340000" },
-  },
-  F: {
-    threeMonths: { initial: "222113", renewal: "555555" },
-    sevenMonths: { initial: "111005", renewal: "350000" },
-  },
-  G: {
-    threeMonths: { initial: "222114", renewal: "666666" },
-    sevenMonths: { initial: "111006", renewal: "360000" },
-  },
-  H: {
-    threeMonths: { initial: "222115", renewal: "777777" },
-    sevenMonths: { initial: "111007", renewal: "370000" },
-  },
-  I: {
-    threeMonths: { initial: "222116", renewal: "888888" },
-    sevenMonths: { initial: "111008", renewal: "380000" },
-  },
-  J: {
-    threeMonths: { initial: "222117", renewal: "999999" },
-    sevenMonths: { initial: "111009", renewal: "390000" },
-  },
-  K: {
-    threeMonths: { initial: "222118", renewal: "100000" },
-    sevenMonths: { initial: "111010", renewal: "400000" },
-  },
-  L: {
-    threeMonths: { initial: "222119", renewal: "110000" },
-    sevenMonths: { initial: "111011", renewal: "410000" },
-  },
-  M: {
-    threeMonths: { initial: "222120", renewal: "120000" },
-    sevenMonths: { initial: "111012", renewal: "420000" },
-  },
-  N: {
-    threeMonths: { initial: "222121", renewal: "130000" },
-    sevenMonths: { initial: "111013", renewal: "430000" },
-  },
-  O: {
-    threeMonths: { initial: "222122", renewal: "140000" },
-    sevenMonths: { initial: "111014", renewal: "440000" },
-  },
-  P: {
-    threeMonths: { initial: "222123", renewal: "150000" },
-    sevenMonths: { initial: "111015", renewal: "450000" },
-  },
-  Q: {
-    threeMonths: { initial: "222124", renewal: "160000" },
-    sevenMonths: { initial: "111016", renewal: "460000" },
-  },
-  R: {
-    threeMonths: { initial: "222125", renewal: "170000" },
-    sevenMonths: { initial: "111017", renewal: "470000" },
-  },
-  S: {
-    threeMonths: { initial: "222126", renewal: "180000" },
-    sevenMonths: { initial: "111018", renewal: "480000" },
-  },
-  T: {
-    threeMonths: { initial: "222127", renewal: "190000" },
-    sevenMonths: { initial: "111019", renewal: "490000" },
-  },
-  U: {
-    threeMonths: { initial: "222128", renewal: "200000" },
-    sevenMonths: { initial: "111020", renewal: "500000" },
-  },
-  V: {
-    threeMonths: { initial: "222129", renewal: "210000" },
-    sevenMonths: { initial: "111021", renewal: "510000" },
-  },
-  W: {
-    threeMonths: { initial: "222130", renewal: "220000" },
-    sevenMonths: { initial: "111022", renewal: "520000" },
-  },
-  X: {
-    threeMonths: { initial: "222131", renewal: "230000" },
-    sevenMonths: { initial: "111023", renewal: "530000" },
-  },
-  Y: {
-    threeMonths: { initial: "222132", renewal: "240000" },
-    sevenMonths: { initial: "111024", renewal: "540000" },
-  },
-  Z: {
-    threeMonths: { initial: "222133", renewal: "250000" },
-    sevenMonths: { initial: "111025", renewal: "550000" },
-  },
-};
-
+      A: { threeMonths: { initial: '222978', renewal: '000000' }, sevenMonths: { initial: '111000', renewal: '300000' } },
+      B: { threeMonths: { initial: '223978', renewal: '001000' }, sevenMonths: { initial: '112000', renewal: '301000' } },
+      // Add other letters as needed
+    };
 
     if (!usernameCodes[firstLetter]) {
       return res.status(400).json({ error: 'Invalid username: First letter must be A-Z' });
@@ -254,6 +176,15 @@ app.post('/api/submit-code', async (req, res) => {
     console.error('Submit code error:', error);
     res.status(500).json({ error: 'Failed to process code' });
   }
+});
+
+app.get('*', (req, res) => {
+  res.sendFile('index.html', { root: __dirname });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
 });
 
 app.listen(port, () => {

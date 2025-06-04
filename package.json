@@ -4,21 +4,24 @@
   "description": "Pharmacy Technician National Prep Quiz",
   "main": "server.js",
   "scripts": {
+    "preinstall": "cross-env-shell \"if [ \\\"$npm_config_platform\\\" != \\\"win32\\\" ]; then apt-get update && apt-get install -y python3 make g++; fi\"",
     "start": "node server.js"
   },
   "engines": {
     "node": ">=18.x"
   },
   "dependencies": {
-    "express": "^4.21.2",
-    "mongodb": "^4.17.2",
-    "dotenv": "^10.0.0",
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "bcrypt": "^5.1.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.21.2",
     "helmet": "^5.0.2",
+    "mongodb": "^4.17.2",
     "morgan": "^1.10.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
