@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Technician National Prep Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="google-admob-app-id" content="YOUR_ADMOB_APP_ID">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Pharmacy Technician National Prep Quiz</h1>
+        <button id="logout-btn" style="display: none;">Logout</button>
+    </header>
+
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="form-group">
+            <label for="login-username">Username:</label>
+            <input type="text" id="login-username" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" placeholder="Enter your password">
+        </div>
+        <button id="login-btn">Login</button>
+        <p id="login-error" class="warning" style="display: none;"></p>
+        <p>Don't have an account? <button type="button" id="show-register">Register here</button></p>
+    </div>
+
+    <!-- Registration Screen -->
+    <div id="register-screen" style="display: none;">
+        <div class="form-group">
+            <label for="register-username">Username:</label>
+            <input type="text" id="register-username" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+            <label for="register-password">Password:</label>
+            <input type="password" id="register-password" placeholder="Create a password">
+        </div>
+        <button id="register-btn">Register</button>
+        <p id="register-error" class="warning" style="display: none;"></p>
+        <p>Already have an account? <button type="button" id="show-login">Login here</button></p>
+    </div>
+
+    <!-- Subscription Screen -->
+    <div id="subscription-screen" style="display: none;">
+        <h2>Unlock Full Access</h2>
+        <p>Free users can access 15 questions per course. For full access (25, 50, or 100 questions), subscribe by following these steps:</p>
+        <p class="code-instructions">
+            1. Email <a href="mailto:shefzlaw1234@gmail.com">shefzlaw1234@gmail.com</a> to receive payment details for your chosen plan (NGN 1000 for 3 months or NGN 2000 for 7 months).<br>
+            2. Make the payment as instructed.<br>
+            3. Call <a href="tel:07043846346" class="phone-link">07043846346</a> to confirm your payment and receive your access code.
+        </p>
+        <div class="form-group">
+            <label>Subscription Plan:</label>
+            <div>
+                <input type="radio" id="sub-3-months" name="subscription-plan" value="3" checked>
+                <label for="sub-3-months">3 Months (NGN 1000)</label>
+            </div>
+            <div>
+                <input type="radio" id="sub-7-months" name="subscription-plan" value="7">
+                <label for="sub-7-months">7 Months (NGN 2000)</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="access-code">Access Code:</label>
+            <input type="text" id="access-code" placeholder="Enter your access code">
+        </div>
+        <button id="submit-code-btn">Submit Code</button>
+        <button id="free-user-btn">I’m a Free User</button>
+        <p id="subscription-error" class="warning" style="display: none;"></p>
+        <p class="warning">Warning: Do not share your access code with others, as it may lead to restricted access.</p>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" style="display: none;">
+        <div class="form-group">
+            <label for="user-name">Enter Your Name:</label>
+            <input type="text" id="user-name" placeholder="Your Name">
+        </div>
+        <div class="form-group">
+            <label for="course-select">Select Course:</label>
+            <select id="course-select">
+                <option value="">-- Select a Course --</option>
+                <option value="Use of English">Use of English</option>
+                <option value="Basic Dispensing Theory">Basic Dispensing Theory</option>
+                <option value="Action and Use of Medicines">Action and Use of Medicines</option>
+                <option value="Primary Health Care">Primary Health Care</option>
+                <option value="Anatomy and Physiology">Anatomy and Physiology</option>
+                <option value="Principles of Pharmacy Technician Practice">Principles of Pharmacy Technician Practice</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="question-count">Number of Questions:</label>
+            <select id="question-count"></select>
+        </div>
+        <button id="start-btn">Start Quiz</button>
+        <p id="start-error" class="warning" style="display: none;"></p>
+        <div id="ad-container" style="margin-top: 20px; text-align: center;">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:320px;height:50px"
+                 data-ad-client="YOUR_ADMOB_CLIENT_ID"
+                 data-ad-slot="YOUR_ADMOB_SLOT_ID"></ins>
+        </div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" style="display: none;">
+        <div class="timer">
+            Time Left: <span id="time-left">00:00</span>
+        </div>
+        <div id="question-number"></div>
+        <div id="question-text"></div>
+        <div id="options"></div>
+        <div class="navigation">
+            <button id="back-btn">Back</button>
+            <button id="next-btn">Next</button>
+            <button id="cancel-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" style="display: none;">
+        <h2>Quiz Results</h2>
+        <p>Score: <span id="score"></span></p>
+        <p>Percentage: <span id="percentage"></span></p>
+        <button id="restart-btn">Restart Quiz</button>
+        <button id="home-btn">Home</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
